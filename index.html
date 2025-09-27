@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C3B: Comics Cross-Cultural Benchmark</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#64748B',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        //sans: ['Inter', 'system-ui', 'sans-serif'],
+                        sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+                        //mono: ['JetBrains Mono', 'monospace']
+                        mono: ['Source Code Pro', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+                gap: 1.5rem;
+            }
+            .image-card {
+                @apply bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+            }
+            .image-overlay {
+                @apply absolute inset-0 bg-black bg-opacity-60 opacity-0 transition-opacity duration-300 flex items-center justify-center;
+            }
+            .image-container:hover .image-overlay {
+                @apply opacity-100;
+            }
+            .lang-hidden {
+                display: none;
+            }
+            .image-container {
+  @apply relative overflow-hidden;
+  /* 设置固定比例，例如16:9 */
+  padding-bottom: 56.25%; /* 16:9的比例计算：9/16 = 0.5625 */
+  height: 0;
+}
+
+.image-container img {
+  @apply absolute top-0 left-0 w-full h-full;
+  object-fit: contain; /* 关键属性：保持图片完整并自动缩放 */
+  background-color: #f1f1f1; /* 可选：为图片周围的空白区域添加背景色 */
+}
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="font-bold text-xl text-primary">
+                <span class="lang-zh">Culture In a Frame: C<sup>3</sup>B as a Comic-Based Benchmark for Multimodal Culturally Awareness</span>
+                <span class="lang-en lang-hidden">Culture In a Frame: C<sup>3</sup>B as a Comic-Based Benchmark for Multimodal Culturally Awareness</span>
+            </div>
+                
+                <!-- 语言切换按钮 -->
+                <div class="flex border rounded-lg overflow-hidden">
+                    <button id="lang-zh-btn" class="px-3 py-1 bg-primary text-white hover:bg-primary/90 transition-colors">
+                        中文
+                    </button>
+                    <button id="lang-en-btn" class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
+                        English
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- 顶部说明文字 -->
+        <section class="mb-16 max-w-4xl mx-auto">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-gray-900 mb-6 leading-tight">
+                <span class="lang-zh">C<sup>3</sup>B: 漫画跨文化基准测试</span>
+                <span class="lang-en lang-hidden">C<sup>3</sup>B: Comics Cross-Cultural Benchmark</span>
+            </h1>
+            <p class="text-lg text-gray-700 mb-6 text-balance">
+                <span class="lang-zh">文化感知能力已成为多模态大型语言模型（MLLMs）的核心能力。然而，现有基准测试在任务设计上缺乏难度递进性，且跨语言任务存在不足。此外，现有基准测试常采用真实世界图像，而单张真实世界图像通常仅包含一种文化，这使得这些基准测试对多模态大型语言模型而言相对简单。基于此，我们提出了 C³B（漫画跨文化基准测试，Comics Cross-Cultural Benchmark）—— 一个全新的、涵盖多文化、多任务与多语言的文化感知能力基准测试。C³B 包含 2000 余张图像及 18000 余对问答（QA）样本，围绕三个难度递进的任务构建：从基础的视觉识别，到更高层次的文化冲突理解，最终延伸至文化内容生成。我们在 11 个开源多模态大型语言模型上开展了评估，结果显示模型性能与人类表现之间存在显著差距。这一差距表明，C³B 对当前多模态大型语言模型构成了严峻挑战，有望推动未来相关研究以提升模型的文化感知能力。</span>
+                <span class="lang-en lang-hidden">Cultural awareness capabilities has emerged as a critical capability for Multimodal Large Language Models (MLLMs). However, current benchmarks lack progressed difficulty in their task design and are deficient in cross-lingual tasks. Moreover, current benchmarks often use real-world images. Each real-world image typically contains one culture, making these benchmarks relatively easy for MLLMs. Based on this, we propose C<sup>3</sup>B (<b>C</b>omics <b>C</b>ross-<b>C</b>ultural <b>B</b>enchmark), a novel multicultural, multitask and multilingual cultural awareness capabilities benchmark. C<sup>3 </sup>B comprises over 2000 images and over 18000 QA pairs, constructed on three tasks with progressed difficulties, from basic visual recognition to higher-level cultural conflict understanding, and finally to cultural content generation. We conducted evaluations on 11 open-source MLLMs, revealing a significant performance gap between MLLMs and human performance. The gap demonstrates that C<sup>3</sup>B poses substantial challenges for current MLLMs, encouraging future research to advance the cultural awareness capabilities of MLLMs.</span>
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <div class="bg-blue-50 px-4 py-2 rounded-lg flex items-center">
+                    <i class="fa fa-image text-primary mr-2"></i>
+                    <span class="lang-zh">2220张图像</span>
+                    <span class="lang-en lang-hidden">2220 Images</span>
+                </div>
+                <div class="bg-green-50 px-4 py-2 rounded-lg flex items-center">
+                    <i class="fa fa-question-circle text-green-600 mr-2"></i>
+                    <span class="lang-zh">18789个问答对</span>
+                    <span class="lang-en lang-hidden">18789 QA Pairs</span>
+                </div>
+                <div class="bg-purple-50 px-4 py-2 rounded-lg flex items-center">
+                    <i class="fa fa-calendar text-purple-600 mr-2"></i>
+                    <span class="lang-zh">更新于2025年</span>
+                    <span class="lang-en lang-hidden">Updated in 2025</span>
+                </div>
+                <div class="bg-amber-50 px-4 py-2 rounded-lg flex items-center">
+                    <i class="fa fa-globe text-amber-600 mr-2"></i>
+                    <span class="lang-zh">涵盖77文化</span>
+                    <span class="lang-en lang-hidden">Covering 77 Cultures</span>
+                </div>
+                <div class="bg-red-50 px-4 py-2 rounded-lg flex items-center">
+                    <i class="fa fa-language text-red-600 mr-2"></i>
+                    <span class="lang-zh">包含五个语言对</span>
+                    <span class="lang-en lang-hidden">Contains 5 Language Pairs</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 图片画廊 -->
+        <section id="gallery" class="mb-20">
+            <h2 class="text-2xl font-bold mb-8 text-center">
+                <span class="lang-zh">图片展示</span>
+                <span class="lang-en lang-hidden">Image Gallery</span>
+            </h2>
+            
+            <div class="gallery-grid">
+                <div class="image-card">
+                    <div class="image-container relative aspect-video overflow-hidden">
+                        <img src="./1006.png" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="image-card">
+                    <div class="image-container relative aspect-video overflow-hidden">
+                        <img src="./1010.png" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="image-card">
+                    <div class="image-container relative aspect-video overflow-hidden">
+                        <img src="./1012.png" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="image-card">
+                    <div class="image-container relative aspect-video overflow-hidden">
+                        <img src="./1013.png" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="image-card">
+                    <div class="image-container relative aspect-video overflow-hidden">
+                        <img src="./1015.png" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="image-card">
+                    <div class="image-container relative aspect-video overflow-hidden">
+                        <img src="./1017.png" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="gallery" class="mb-20">
+            <h2 class="text-2xl font-bold mb-8 text-center">
+                <span class="lang-zh">数据示例</span>
+                <span class="lang-en lang-hidden">Data Example</span>
+            </h2>
+            <div class="flex items-center justify-center">
+                <img src="./example.png" class="object-cover" width="50%">
+            </div>
+            <div class="flex items-center justify-center">
+                <img src="./example2.png" class="object-cover" width="50%">
+            </div>
+        </section>
+
+        <!-- BibTex 引用 -->
+        <section id="citation" class="bg-gray-100 rounded-xl p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-6">
+                <span class="lang-zh">引用信息</span>
+                <span class="lang-en lang-hidden">Citation Information</span>
+            </h2>
+            <p class="mb-4 text-gray-700">
+                <span class="lang-zh">如果您在研究中使用了本数据集，请使用以下BibTex格式引用：</span>
+                <span class="lang-en lang-hidden">If you use this dataset in your research, please cite it using the following BibTex format：</span>
+            </p>
+            
+            <div class="relative">
+                <pre class="bg-gray-900 text-gray-300 p-4 rounded-lg overflow-x-auto font-mono text-sm"><code>@dataset{natural_scenes_2023,
+  author       = {Zhang, Wei and Li, Ming and Wang, Jian},
+  title        = {Natural Scenes Image Dataset},
+  month        = may,
+  year         = 2023,
+  publisher    = {Zenodo},
+  version      = {1.0},
+  doi          = {10.5281/zenodo.1234567},
+  url          = {https://doi.org/10.5281/zenodo.1234567}
+}</code></pre>
+                <button id="copy-btn" class="absolute top-4 right-4 bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                    <i class="fa fa-copy mr-1"></i>
+                    <span class="lang-zh">复制</span>
+                    <span class="lang-en lang-hidden">Copy</span>
+                </button>
+            </div>
+            
+            <div id="copy-alert" class="hidden mt-3 text-green-600 bg-green-50 p-3 rounded-lg flex items-center">
+                <i class="fa fa-check-circle mr-2"></i>
+                <span class="lang-zh">BibTex已复制到剪贴板</span>
+                <span class="lang-en lang-hidden">BibTex copied to clipboard</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-gray-300 py-10 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="font-bold text-xl text-white mb-2">
+                        <span class="lang-zh">C<sup>3</sup>B: 漫画跨文化基准测试</span>
+                        <span class="lang-en lang-hidden">C<sup>3</sup>B: Comics Cross-Cultural Benchmark</span>
+                    </div>
+                    <p class="text-gray-400 max-w-md text-center md:text-left">
+                        <span class="lang-zh">一个全新的、涵盖多文化、多任务与多语言的文化感知能力基准测试。</span>
+                        <span class="lang-en lang-hidden">A novel multicultural, multitask and multilingual cultural awareness capabilities benchmark.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 图片查看模态框 -->
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full">
+            <button id="close-modal" class="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300" aria-label="Close">
+                <i class="fa fa-times"></i>
+            </button>
+            <img id="modal-image" src="" alt="大图预览 | Large image preview" class="max-h-[80vh] w-full object-contain">
+            <div id="modal-caption" class="bg-white p-4 rounded-b-lg mt-2">
+                <h3 class="font-bold text-lg" id="modal-title"></h3>
+                <p class="text-gray-600" id="modal-desc"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 多语言切换功能
+        const langZhBtn = document.getElementById('lang-zh-btn');
+        const langEnBtn = document.getElementById('lang-en-btn');
+        const zhElements = document.querySelectorAll('.lang-zh');
+        const enElements = document.querySelectorAll('.lang-en');
+        
+        // 切换到中文
+        langZhBtn.addEventListener('click', () => {
+            zhElements.forEach(el => el.classList.remove('lang-hidden'));
+            enElements.forEach(el => el.classList.add('lang-hidden'));
+            langZhBtn.classList.add('bg-primary', 'text-white');
+            langZhBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            langEnBtn.classList.add('bg-gray-200', 'text-gray-700');
+            langEnBtn.classList.remove('bg-primary', 'text-white');
+            document.documentElement.lang = 'zh-CN';
+        });
+        
+        // 切换到英文
+        langEnBtn.addEventListener('click', () => {
+            enElements.forEach(el => el.classList.remove('lang-hidden'));
+            zhElements.forEach(el => el.classList.add('lang-hidden'));
+            langEnBtn.classList.add('bg-primary', 'text-white');
+            langEnBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            langZhBtn.classList.add('bg-gray-200', 'text-gray-700');
+            langZhBtn.classList.remove('bg-primary', 'text-white');
+            document.documentElement.lang = 'en';
+        });
+        
+        // 复制BibTex功能
+        const copyBtn = document.getElementById('copy-btn');
+        const bibtexCode = document.querySelector('pre code').textContent;
+        const copyAlert = document.getElementById('copy-alert');
+        
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(bibtexCode).then(() => {
+                copyAlert.classList.remove('hidden');
+                setTimeout(() => {
+                    copyAlert.classList.add('hidden');
+                }, 3000);
+            });
+        });
+        
+        // 图片模态框功能
+        const imageModal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const closeModal = document.getElementById('close-modal');
+        const imageCards = document.querySelectorAll('.image-card');
+        
+        imageCards.forEach(card => {
+            const image = card.querySelector('img');
+            const titleZh = card.querySelector('h3 .lang-zh').textContent;
+            const titleEn = card.querySelector('h3 .lang-en').textContent;
+            const descZh = card.querySelector('p .lang-zh').textContent;
+            const descEn = card.querySelector('p .lang-en').textContent;
+            const viewBtn = card.querySelector('.image-overlay button');
+            
+            viewBtn.addEventListener('click', () => {
+                // 根据当前语言设置模态框内容
+                const isZh = !zhElements[0].classList.contains('lang-hidden');
+                modalImage.src = image.src.replace('/600/400', '/1200/800');
+                modalImage.alt = image.alt;
+                modalTitle.textContent = isZh ? titleZh : titleEn;
+                modalDesc.textContent = isZh ? descZh : descEn;
+                
+                imageModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // 防止背景滚动
+            });
+        });
+        
+        closeModal.addEventListener('click', () => {
+            imageModal.classList.add('hidden');
+            document.body.style.overflow = ''; // 恢复滚动
+        });
+        
+        // 点击模态框外部关闭
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                imageModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // 页面加载时根据浏览器语言偏好设置初始语言
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                langEnBtn.click();
+            } else {
+                langZhBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
+    
