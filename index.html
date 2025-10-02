@@ -283,6 +283,11 @@
             langZhBtn.classList.remove('bg-primary', 'text-white');
             document.documentElement.lang = 'en';
         });
+
+        // 页面加载时默认显示英语
+        document.addEventListener('DOMContentLoaded', () => {
+            langEnBtn.click(); // 直接触发英语按钮点击事件
+        });
         
         // 复制BibTex功能
         const copyBtn = document.getElementById('copy-btn');
@@ -350,15 +355,7 @@
             });
         });
         
-        // 页面加载时根据浏览器语言偏好设置初始语言
-        document.addEventListener('DOMContentLoaded', () => {
-            const userLang = navigator.language || navigator.userLanguage;
-            if (userLang.startsWith('en')) {
-                langEnBtn.click();
-            } else {
-                langZhBtn.click();
-            }
-        });
+
     </script>
 </body>
 </html>
